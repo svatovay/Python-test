@@ -1,22 +1,12 @@
 from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, DateTime
-from sqlalchemy.engine import URL
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 from external_requests import GetWeather
 
 # Создание сессии
-SQLALCHEMY_DATABASE_URI = 'sqlite:///test.db'
+# SQLALCHEMY_DATABASE_URI = 'sqlite:///test.db'
+SQLALCHEMY_DATABASE_URI = 'postgresql+psycopg2://postgres:password@postgres:5432/testcrt'
 engine = create_engine(SQLALCHEMY_DATABASE_URI)
-
-# DATABASE = {
-#     'drivername': 'postgresql+psycopg2',
-#     'host': 'localhost',
-#     'port': '5432',
-#     'username': 'postgres',
-#     'password': 'password',
-#     'database': 'testcrt'
-# }
-# engine = create_engine(URL(**DATABASE))
 
 Session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
