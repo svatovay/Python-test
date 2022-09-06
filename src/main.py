@@ -3,7 +3,7 @@ from typing import List
 
 from fastapi import FastAPI, HTTPException, Query
 from database import engine, Session, Base, City, User, Picnic, PicnicRegistration
-from external_requests import CheckCityExisting, GetWeatherRequest
+from external_requests import CheckCityExisting
 from models import RegisterUserRequest, UserModel
 
 app = FastAPI()
