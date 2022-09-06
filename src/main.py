@@ -11,6 +11,9 @@ app = FastAPI()
 
 @app.get('/create-city/', summary='Create City', description='Создание города по его названию')
 def create_city(city: str = Query(description="Название города", default=None)):
+    """
+    Добавление города
+    """
     if city is None:
         raise HTTPException(status_code=400, detail='Параметр city должен быть указан')
     check = CheckCityExisting()
@@ -59,7 +62,7 @@ def users_list(q: List[int] = Query([1, 150],
     } for user in users]
 
 
-@app.post('/register-user/', summary='CreateUser', response_model=UserModel)
+@app.post('/register-user/', summary='Create User', response_model=UserModel)
 def register_user(user: RegisterUserRequest):
     """
     Регистрация пользователя
@@ -101,6 +104,9 @@ def all_picnics(datetime: dt.datetime = Query(default=None, description='Вре�
 
 @app.get('/picnic-add/', summary='Picnic Add', tags=['picnic'])
 def picnic_add(city_id: int = None, datetime: dt.datetime = None):
+    """
+    Добавление пикника
+    """
     p = Picnic(city_id=city_id, time=datetime)
     s = Session()
     s.add(p)
@@ -114,11 +120,22 @@ def picnic_add(city_id: int = None, datetime: dt.datetime = None):
 
 
 @app.get('/picnic-register/', summary='Picnic Registration', tags=['picnic'])
-def register_to_picnic(*_, **__,):
+def register_to_picnic(user_id: int = None, picnic_id: int = None, ):
     """
     Регистрация пользователя на пикник
     (Этот эндпойнт необходимо реализовать в процессе выполнения тестового задания)
     """
-    # TODO: Сделать логику
-    return ...
+    pr = PicnicRegistration(user_id=user_id, picnic_id=picnic_id)
+    s = Session()
+    s.add(pr)
+    s.commit()
 
+    # TODO: Сделать логику
+    return {
+        'id': pr.id,
+        'user': Session().query(User).filter(User.id == pr.user_id).first().name,
+        'picnic_city': Session().query(City).filter(
+            City.id == Session().query(Picnic).filter(
+                Picnic.id == pr.picnic_id).first().city_id).first().name,
+        'picnic_datetime': Session().query(Picnic).filter(Picnic.id == pr.picnic_id).first().time,
+    }
