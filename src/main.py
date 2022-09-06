@@ -108,7 +108,7 @@ def picnic_add(city_id: int = None, datetime: dt.datetime = None):
 
     return {
         'id': p.id,
-        'city': Session().query(City).filter(City.id == p.id).first().name,
+        'city': Session().query(City).filter(City.id == p.city_id).first().name,
         'time': p.time,
     }
 
