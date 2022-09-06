@@ -130,7 +130,6 @@ def register_to_picnic(user_id: int = None, picnic_id: int = None, ):
     s.add(pr)
     s.commit()
 
-    # TODO: Сделать логику
     return {
         'id': pr.id,
         'user': Session().query(User).filter(User.id == pr.user_id).first().name,
