@@ -1,7 +1,6 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-import models
 
 # Создание сессии
 SQLALCHEMY_DATABASE_URI = 'sqlite:///test.db'
@@ -12,9 +11,6 @@ Session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 # Подключение базы (с автоматической генерацией моделей)
 Base = declarative_base()
-
-# Создание таблиц по моделям
-models.Base.metadata.create_all(bind=engine)
 
 
 def get_db():

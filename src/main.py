@@ -1,11 +1,15 @@
 from fastapi import FastAPI
 from routers import users, cities, picnics
+from sql_app import models, database
 
-Base.metadata.create_all(bind=engine)
+# Создание таблиц по моделям
+models.Base.metadata.create_all(bind=database.engine)
 
 app = FastAPI()
 
 app.include_router(users.router)
+
+
 app.include_router(cities.router)
 app.include_router(picnics.router)
 

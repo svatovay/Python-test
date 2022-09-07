@@ -61,7 +61,7 @@ class GetWeather(GetWeatherSiteRequest):
         Args:
             city: Город
         Returns:
-
+            float
         """
         url = self.get_weather_url(city)
         r = self.send_request(url)
@@ -83,7 +83,7 @@ class CheckCityExisting(GetWeatherSiteRequest):
         Args:
             city: Название города
         Returns:
-
+            bool
         """
         url = self.get_weather_url(city)
         r = self.send_request(url)

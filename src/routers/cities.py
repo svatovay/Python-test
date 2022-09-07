@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Query, HTTPException
+from fastapi import APIRouter, Query, HTTPException, Depends
+from sqlalchemy.orm import Session
 
 from external_requests import CheckCityExisting
-from sql_app.models import Session, City
+from sql_app import crud, database, schemas
 
 router = APIRouter(
     prefix="/cities",
@@ -10,34 +11,38 @@ router = APIRouter(
 
 
 @router.get("/", summary='Get Cities')
-def read_cities(q: str = Query(description="Название города", default=None)):
+def read_cities(db: Session = Depends(database.get_db)):
     """
     Получение списка городов
-    Фильтрация по q - названию города
     """
-    if q:
-        return Session().query(City).filter(City.name == q).all()
-    cities = Session().query(City).all()
-
-    return [{'id': city.id, 'name': city.name, 'weather': city.weather} for city in cities]
+    db_cities = crud.get_cities(db)
+    return [schemas.CityModel.from_orm(db_city) for db_city in db_cities]
 
 
-@router.post("/{city}", summary='Create City')
-def add_city(city: str = Query(description="Название города", default=None)):
+@router.get("/{city_name}", summary='Get City')
+def read_city(q: str = Query(description="Название города", default=None),
+              db: Session = Depends(database.get_db)):
+    """
+    Получение города по q - названию города
+    """
+    db_city = crud.get_city(db, name=q)
+    return schemas.CityModel.from_orm(db_city)
+
+
+@router.post("/", summary='Create City')
+def add_city(city: schemas.CityCreate,
+             db: Session = Depends(database.get_db)):
     """
     Добавление города
     """
-    if city is None:
+    if city.name is None:
         raise HTTPException(status_code=400, detail='Параметр city должен быть указан')
     check = CheckCityExisting()
-    if not check.check_existing(city):
+    if not check.check_existing(city.name):
         raise HTTPException(status_code=400, detail='Параметр city должен быть существующим городом')
 
-    city_object = Session().query(City).filter(City.name == city.capitalize()).first()
-    if city_object is None:
-        city_object = City(name=city.capitalize())
-        s = Session()
-        s.add(city_object)
-        s.commit()
+    db_city = crud.get_city(db, name=city.name)
+    if db_city is None:
+        db_city = crud.create_city(db, city)
 
-    return {'id': city_object.id, 'name': city_object.name, 'weather': city_object.weather}
+    return schemas.CityModel.from_orm(db_city)
