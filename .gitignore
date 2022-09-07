@@ -1,4 +1,4 @@
 /.enw/
 /.idea/
 *__pycache__*
-src/test.db
+src/sql_app/test.db
