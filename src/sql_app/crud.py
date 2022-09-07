@@ -1,3 +1,5 @@
+import datetime as dt
+
 from sqlalchemy.orm import Session
 
 from . import models, schemas
@@ -62,11 +64,17 @@ def get_picnic(db: Session, name: str):
     return db.query(models.City).filter(models.City.name == name).first()
 
 
-def get_picnics(db: Session):
+def get_picnics(db: Session, picnic_date: dt.datetime, past: bool = True):
     """
     Возвращает модели пикников из БД
     """
-    return db.query(models.City).all()
+    # TODO: Возможно формировать итоговый ответ для запроса
+    if picnic_date is not None:
+        db_picnics = db.query(models.Picnic).filter(models.Picnic.time == picnic_date)
+    if not past:
+        db_picnics = db.query(models.Picnic).filter(models.Picnic.time >= dt.datetime.now())
+
+    return db_picnics
 
 
 def create_picnic(db: Session, picnic: schemas.PicnicCreate):
@@ -81,6 +89,9 @@ def create_picnic(db: Session, picnic: schemas.PicnicCreate):
 
 
 def create_picnic_registration_record(db: Session, city: schemas.CityCreate):
+    """
+    Делает регистрационную запись: пользователь -> пикник
+    """
     db_city = models.City(**city.dict())
     db.add(db_city)
     db.commit()

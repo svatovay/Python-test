@@ -1,4 +1,5 @@
 import datetime as dt
+from typing import List
 
 from pydantic import BaseModel
 
@@ -45,14 +46,17 @@ class PicnicCreate(PicnicBase):
     pass
 
 
-class PicnicModel(PicnicBase):
-    id: int
-
-    class Config:
-        orm_mode = True
-
-
 class PicnicRegistration(BaseModel):
     id: int
     user_id: int
     picnic_id: int
+
+
+class PicnicModel(PicnicBase):
+    # TODO: корректное возвращение значений
+    id: int
+    city: CityModel
+    users: List[PicnicRegistration]
+
+    class Config:
+        orm_mode = True
