@@ -21,7 +21,6 @@ def read_picnics(datetime: dt.datetime = Query(default=None, description='Вре
     Список всех пикников
     Фильтрация по дате и завершённости
     """
-    # TODO: Доделать ответ
     db_picnics = crud.get_picnics(db, picnic_date=datetime, past=past)
     return db_picnics
 
@@ -38,7 +37,7 @@ def add_picnic(picnic: schemas.PicnicCreate = Depends(),
 
 
 # Изменённый  /picnic-register/
-@router.post('/register', summary='Picnic Registration',
+@router.post('/register/', summary='Picnic Registration',
              response_model=schemas.PicnicRegistrationModel)
 def register_to_picnic(picnic_reg: schemas.PicnicRegistration = Depends(),
                        db: Session = Depends(database.get_db)):

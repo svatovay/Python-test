@@ -18,7 +18,7 @@ def test_read_city():
 
 
 def test_add_city():
-    response = client.post(f"/cities/?name={city}")
+    response = client.post("/cities/", params={'name': city})
     assert response.status_code == 200
     assert response.json()['name'] == city
     assert list(response.json().keys()) == ['name', 'id', 'weather']
