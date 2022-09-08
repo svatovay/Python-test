@@ -66,15 +66,20 @@ def get_picnic(db: Session, name: str):
 
 def get_picnics(db: Session, picnic_date: dt.datetime, past: bool = True):
     """
-    Возвращает модели пикников из БД
+    Возвращает модели пикников из БД со списком зарегистрированных пользователей
     """
-    # TODO: Возможно формировать итоговый ответ для запроса
     if picnic_date is not None:
-        db_picnics = db.query(models.Picnic).filter(models.Picnic.time == picnic_date)
+        db_picnics = db.query(models.Picnic).filter(models.Picnic.time == picnic_date).all()
     if not past:
-        db_picnics = db.query(models.Picnic).filter(models.Picnic.time >= dt.datetime.now())
+        db_picnics = db.query(models.Picnic).filter(models.Picnic.time >= dt.datetime.now()).all()
 
-    return db_picnics
+    picnic_model_reg_users = [{
+        'id': picnic.id,
+        'city': db.query(models.City).filter(models.City.id == picnic.city_id).first(),
+        'time': picnic.time,
+        'users': [reg.user for reg in picnic.users]
+    } for picnic in db_picnics]
+    return picnic_model_reg_users
 
 
 def create_picnic(db: Session, picnic: schemas.PicnicCreate):
@@ -88,12 +93,18 @@ def create_picnic(db: Session, picnic: schemas.PicnicCreate):
     return db_picnic
 
 
-def create_picnic_registration_record(db: Session, city: schemas.CityCreate):
+def create_picnic_registration_record(db: Session, picnic_reg: schemas.PicnicRegistration):
     """
     Делает регистрационную запись: пользователь -> пикник
     """
-    db_city = models.City(**city.dict())
-    db.add(db_city)
+    db_picnic_reg = models.PicnicRegistration(**picnic_reg.dict())
+    db.add(db_picnic_reg)
     db.commit()
-    db.refresh(db_city)
-    return db_city
+    db.refresh(db_picnic_reg)
+    picnic_reg_model = {
+        'id': db_picnic_reg.id,
+        'user': db_picnic_reg.user,
+        'picnic_city': db.query(models.City).filter(models.City.id == db_picnic_reg.picnic.city_id).first(),
+        'picnic_datetime': db_picnic_reg.picnic.time,
+    }
+    return picnic_reg_model

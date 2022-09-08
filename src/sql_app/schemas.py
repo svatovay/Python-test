@@ -5,16 +5,25 @@ from pydantic import BaseModel
 
 
 class UserBase(BaseModel):
+    """
+    Родительская модель пользователя
+    """
     name: str
     surname: str
     age: int
 
 
 class UserCreate(UserBase):
+    """
+    Модель для создания пользователя
+    """
     pass
 
 
 class UserModel(UserBase):
+    """
+    Модель пользователя для вывода
+    """
     id: int
 
     class Config:
@@ -22,14 +31,23 @@ class UserModel(UserBase):
 
 
 class CityBase(BaseModel):
+    """
+    Родительская модель города
+    """
     name: str
 
 
 class CityCreate(CityBase):
+    """
+    Модель для создания города
+    """
     pass
 
 
 class CityModel(CityBase):
+    """
+    Модель города для вывода
+    """
     id: int
     weather: str
 
@@ -38,25 +56,56 @@ class CityModel(CityBase):
 
 
 class PicnicBase(BaseModel):
+    """
+    Родительская модель пикника
+    """
     city_id: int
     time: dt.datetime
 
 
 class PicnicCreate(PicnicBase):
+    """
+    Модель для создания пикника
+    """
     pass
 
 
-class PicnicRegistration(BaseModel):
+class PicnicModel(PicnicBase):
+    """
+    Модель пикника для вывода
+    """
     id: int
+
+    class Config:
+        orm_mode = True
+
+
+class PicnicModelRegUsers(BaseModel):
+    """
+    Модель для вывода пикника со списком зарегистрированных пользователей
+    """
+    id: int
+    city: CityModel
+    time: dt.datetime
+    users: List[UserModel]
+
+    class Config:
+        orm_mode = True
+
+
+class PicnicRegistration(BaseModel):
+    """
+    Модель для создания регистрационной записи пользователя на пикник
+    """
     user_id: int
     picnic_id: int
 
 
-class PicnicModel(PicnicBase):
-    # TODO: корректное возвращение значений
+class PicnicRegistrationModel(BaseModel):
+    """
+    Модель для вывода регистрационной записи пользователя на пикник
+    """
     id: int
-    city: CityModel
-    users: List[PicnicRegistration]
-
-    class Config:
-        orm_mode = True
+    user: UserModel
+    picnic_city: CityModel
+    picnic_datetime: dt.datetime

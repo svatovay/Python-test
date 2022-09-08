@@ -12,7 +12,7 @@ router = APIRouter(
     responses={404: {"description": "Not found"}}, )
 
 
-@router.get("/", summary='Get Picnics', response_model=List[schemas.PicnicModel])
+@router.get("/", summary='Get Picnics', response_model=List[schemas.PicnicModelRegUsers])
 def read_picnics(datetime: dt.datetime = Query(default=None, description='Время пикника (по умолчанию не задано)'),
                  past: bool = Query(default=True, description='Включая уже прошедшие пикники'),
                  db: Session = Depends(database.get_db)):
@@ -24,20 +24,6 @@ def read_picnics(datetime: dt.datetime = Query(default=None, description='Вре
     db_picnics = crud.get_picnics(db, picnic_date=datetime, past=past)
     return db_picnics
 
-    # return [{
-    #     'id': pic.id,
-    #     'city': Session().query(City).filter(City.id == pic.id).first().name,
-    #     'time': pic.time,
-    #     'users': [
-    #         {
-    #             'id': pr.user.id,
-    #             'name': pr.user.name,
-    #             'surname': pr.user.surname,
-    #             'age': pr.user.age,
-    #         }
-    #         for pr in Session().query(PicnicRegistration).filter(PicnicRegistration.picnic_id == pic.id)],
-    # } for pic in picnics]
-
 
 @router.post("/", summary='Create Picnic', response_model=schemas.PicnicModel)
 def add_picnic(picnic: schemas.PicnicCreate = Depends(),
@@ -48,22 +34,13 @@ def add_picnic(picnic: schemas.PicnicCreate = Depends(),
     db_picnic = crud.create_picnic(db, picnic=picnic)
     return db_picnic
 
-# @router.post('/register/', summary='Picnic Registration')
-# def register_to_picnic(user_id: int = None, picnic_id: int = None, ):
-#     """
-#     Регистрация пользователя на пикник
-#     """
-        # TODO: Сделать запрос
-#     pr = PicnicRegistration(user_id=user_id, picnic_id=picnic_id)
-#     s = Session()
-#     s.add(pr)
-#     s.commit()
-#
-#     return {
-#         'id': pr.id,
-#         'user': Session().query(User).filter(User.id == pr.user_id).first().name,
-#         'picnic_city': Session().query(City).filter(
-#             City.id == Session().query(Picnic).filter(
-#                 Picnic.id == pr.picnic_id).first().city_id).first().name,
-#         'picnic_datetime': Session().query(Picnic).filter(Picnic.id == pr.picnic_id).first().time,
-#     }
+
+@router.post('/register', summary='Picnic Registration', response_model=schemas.PicnicRegistrationModel)
+def register_to_picnic(picnic_reg: schemas.PicnicRegistration = Depends(),
+                       db: Session = Depends(database.get_db)):
+    """
+    Регистрация пользователя на пикник
+    """
+    picnic_reg_model = crud.create_picnic_registration_record(db, picnic_reg=picnic_reg)
+
+    return picnic_reg_model
