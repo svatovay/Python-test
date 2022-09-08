@@ -27,9 +27,9 @@ def read_cities(db: Session = Depends(database.get_db)):
 def read_city(city_name: str = Query(description="Название города", default=None),
               db: Session = Depends(database.get_db)):
     """
-    Получение города по city_name - названию города
+    Получение города по city_name (вместо q) - названию города
     """
-    db_city = crud.get_city(db, name=q)
+    db_city = crud.get_city(db, name=city_name)
     return db_city
 
 
