@@ -4,3 +4,5 @@
 src/sql_app/test.db
 
 *.db
+/src/tests/.pytest_cache/
+/src/.pytest_cache/
