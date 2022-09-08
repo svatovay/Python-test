@@ -12,6 +12,7 @@ router = APIRouter(
     responses={404: {"description": "Not found"}}, )
 
 
+# Изменённый /all-picnics/
 @router.get("/", summary='Get Picnics', response_model=List[schemas.PicnicModelRegUsers])
 def read_picnics(datetime: dt.datetime = Query(default=None, description='Время пикника (по умолчанию не задано)'),
                  past: bool = Query(default=True, description='Включая уже прошедшие пикники'),
@@ -25,6 +26,7 @@ def read_picnics(datetime: dt.datetime = Query(default=None, description='Вре
     return db_picnics
 
 
+# Изменённый /picnic-add/
 @router.post("/", summary='Create Picnic', response_model=schemas.PicnicModel)
 def add_picnic(picnic: schemas.PicnicCreate = Depends(),
                db: Session = Depends(database.get_db)):
@@ -35,7 +37,9 @@ def add_picnic(picnic: schemas.PicnicCreate = Depends(),
     return db_picnic
 
 
-@router.post('/register', summary='Picnic Registration', response_model=schemas.PicnicRegistrationModel)
+# Изменённый  /picnic-register/
+@router.post('/register', summary='Picnic Registration',
+             response_model=schemas.PicnicRegistrationModel)
 def register_to_picnic(picnic_reg: schemas.PicnicRegistration = Depends(),
                        db: Session = Depends(database.get_db)):
     """

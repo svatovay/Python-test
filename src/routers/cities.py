@@ -12,6 +12,7 @@ router = APIRouter(
     responses={404: {"description": "Not found"}}, )
 
 
+# Замена /get-cities/
 @router.get("/", summary='Get Cities', response_model=List[schemas.CityModel])
 def read_cities(db: Session = Depends(database.get_db)):
     """
@@ -21,6 +22,7 @@ def read_cities(db: Session = Depends(database.get_db)):
     return db_cities
 
 
+# Изменённый /get-cities/ c q
 @router.get("/{city_name}", summary='Get City', response_model=schemas.CityModel)
 def read_city(q: str = Query(description="Название города", default=None),
               db: Session = Depends(database.get_db)):
@@ -31,6 +33,7 @@ def read_city(q: str = Query(description="Название города", defaul
     return db_city
 
 
+# Изменённый /create-city/
 @router.post("/", summary='Create City', response_model=schemas.CityModel)
 def add_city(city: schemas.CityCreate,
              db: Session = Depends(database.get_db)):

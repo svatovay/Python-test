@@ -66,7 +66,7 @@ def get_picnic(db: Session, name: str):
 
 def get_picnics(db: Session, picnic_date: dt.datetime, past: bool = True):
     """
-    Возвращает модели пикников из БД со списком зарегистрированных пользователей
+    Возвращает модели пикников со списком зарегистрированных пользователей
     """
     if picnic_date is not None:
         db_picnics = db.query(models.Picnic).filter(models.Picnic.time == picnic_date).all()

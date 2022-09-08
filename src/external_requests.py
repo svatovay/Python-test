@@ -16,7 +16,7 @@ class GetWeatherSiteRequest:
         Args:
             city: Город
         Returns:
-
+            url: Ссылка
         """
         url = 'https://api.openweathermap.org/data/2.5/weather'
         url += '?units=metric'
@@ -30,7 +30,7 @@ class GetWeatherSiteRequest:
         Args:
             url: Адрес запроса
         Returns:
-
+            r: response
         """
         r = self.session.get(url)
         return r

@@ -11,6 +11,7 @@ router = APIRouter(
     responses={404: {"description": "Not found"}}, )
 
 
+# Изменённый /users-list/
 @router.get("/", summary='Get Users', response_model=List[schemas.UserModel])
 def read_users(q: List[int] = Query([0, 0], description='Возрастной диапазон пользователей'),
                db: Session = Depends(database.get_db)):
@@ -22,6 +23,7 @@ def read_users(q: List[int] = Query([0, 0], description='Возрастной д
     return db_users
 
 
+# Новый endpoint
 @router.get("/{user_id}", response_model=schemas.UserModel)
 def read_user(user_id: int, db: Session = Depends(database.get_db)):
     """
@@ -31,6 +33,7 @@ def read_user(user_id: int, db: Session = Depends(database.get_db)):
     return db_user
 
 
+# Изменённый /register-user/
 @router.post("/", summary='Create User', response_model=schemas.UserModel)
 def add_user(user: schemas.UserCreate, db: Session = Depends(database.get_db)):
     """
