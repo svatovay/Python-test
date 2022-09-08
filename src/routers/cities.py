@@ -24,10 +24,10 @@ def read_cities(db: Session = Depends(database.get_db)):
 
 # Изменённый /get-cities/ c q
 @router.get("/{city_name}", summary='Get City', response_model=schemas.CityModel)
-def read_city(q: str = Query(description="Название города", default=None),
+def read_city(city_name: str = Query(description="Название города", default=None),
               db: Session = Depends(database.get_db)):
     """
-    Получение города по q - названию города
+    Получение города по city_name - названию города
     """
     db_city = crud.get_city(db, name=q)
     return db_city
@@ -35,7 +35,7 @@ def read_city(q: str = Query(description="Название города", defaul
 
 # Изменённый /create-city/
 @router.post("/", summary='Create City', response_model=schemas.CityModel)
-def add_city(city: schemas.CityCreate,
+def add_city(city: schemas.CityCreate = Depends(),
              db: Session = Depends(database.get_db)):
     """
     Добавление города
