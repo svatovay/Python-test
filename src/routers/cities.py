@@ -1,3 +1,5 @@
+from typing import List
+
 from fastapi import APIRouter, Query, HTTPException, Depends
 from sqlalchemy.orm import Session
 
@@ -10,26 +12,26 @@ router = APIRouter(
     responses={404: {"description": "Not found"}}, )
 
 
-@router.get("/", summary='Get Cities')
+@router.get("/", summary='Get Cities', response_model=List[schemas.CityModel])
 def read_cities(db: Session = Depends(database.get_db)):
     """
     Получение списка городов
     """
     db_cities = crud.get_cities(db)
-    return [schemas.CityModel.from_orm(db_city) for db_city in db_cities]
+    return db_cities
 
 
-@router.get("/{city_name}", summary='Get City')
+@router.get("/{city_name}", summary='Get City', response_model=schemas.CityModel)
 def read_city(q: str = Query(description="Название города", default=None),
               db: Session = Depends(database.get_db)):
     """
     Получение города по q - названию города
     """
     db_city = crud.get_city(db, name=q)
-    return schemas.CityModel.from_orm(db_city)
+    return db_city
 
 
-@router.post("/", summary='Create City')
+@router.post("/", summary='Create City', response_model=schemas.CityModel)
 def add_city(city: schemas.CityCreate,
              db: Session = Depends(database.get_db)):
     """
@@ -45,4 +47,4 @@ def add_city(city: schemas.CityCreate,
     if db_city is None:
         db_city = crud.create_city(db, city)
 
-    return schemas.CityModel.from_orm(db_city)
+    return db_city

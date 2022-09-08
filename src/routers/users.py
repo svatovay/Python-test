@@ -11,7 +11,7 @@ router = APIRouter(
     responses={404: {"description": "Not found"}}, )
 
 
-@router.get("/", summary='Get Users')
+@router.get("/", summary='Get Users', response_model=List[schemas.UserModel])
 def read_users(q: List[int] = Query([0, 0], description='Возрастной диапазон пользователей'),
                db: Session = Depends(database.get_db)):
     """
@@ -19,22 +19,22 @@ def read_users(q: List[int] = Query([0, 0], description='Возрастной д
     Фильтрация по q - возрастному диапазону [min, max]
     """
     db_users = crud.get_users(db, age_range=q)
-    return [schemas.UserModel.from_orm(db_user) for db_user in db_users]
+    return db_users
 
 
-@router.get("/{user_id}")
+@router.get("/{user_id}", response_model=schemas.UserModel)
 def read_user(user_id: int, db: Session = Depends(database.get_db)):
     """
     Получение пользователя
     """
     db_user = crud.get_user(db, user_id=user_id)
-    return schemas.UserModel.from_orm(db_user)
+    return db_user
 
 
-@router.post("/", summary='Create User')
+@router.post("/", summary='Create User', response_model=schemas.UserModel)
 def add_user(user: schemas.UserCreate, db: Session = Depends(database.get_db)):
     """
     Добавление пользователя
     """
     db_user = crud.create_user(db, user=user)
-    return schemas.UserModel.from_orm(db_user)
+    return db_user

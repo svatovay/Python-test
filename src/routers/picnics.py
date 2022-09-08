@@ -1,4 +1,5 @@
 import datetime as dt
+from typing import List
 
 from fastapi import APIRouter, Query, Depends
 from sqlalchemy.orm import Session
@@ -11,7 +12,7 @@ router = APIRouter(
     responses={404: {"description": "Not found"}}, )
 
 
-@router.get("/", summary='Get Picnics')
+@router.get("/", summary='Get Picnics', response_model=List[schemas.PicnicModel])
 def read_picnics(datetime: dt.datetime = Query(default=None, description='Время пикника (по умолчанию не задано)'),
                  past: bool = Query(default=True, description='Включая уже прошедшие пикники'),
                  db: Session = Depends(database.get_db)):
@@ -21,7 +22,7 @@ def read_picnics(datetime: dt.datetime = Query(default=None, description='Вре
     """
     # TODO: Доделать ответ
     db_picnics = crud.get_picnics(db, picnic_date=datetime, past=past)
-    return [schemas.PicnicModel.from_orm(db_picnic) for db_picnic in db_picnics]
+    return db_picnics
 
     # return [{
     #     'id': pic.id,
@@ -38,14 +39,14 @@ def read_picnics(datetime: dt.datetime = Query(default=None, description='Вре
     # } for pic in picnics]
 
 
-@router.post("/", summary='Create Picnic')
+@router.post("/", summary='Create Picnic', response_model=schemas.PicnicModel)
 def add_picnic(picnic: schemas.PicnicCreate = Depends(),
                db: Session = Depends(database.get_db)):
     """
     Добавление пикника
     """
     db_picnic = crud.create_picnic(db, picnic=picnic)
-    return schemas.PicnicModel.from_orm(db_picnic)
+    return db_picnic
 
 # @router.post('/register/', summary='Picnic Registration')
 # def register_to_picnic(user_id: int = None, picnic_id: int = None, ):
